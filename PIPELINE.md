@@ -58,21 +58,56 @@
 ```
 legal-research-pipeline/
 ├── PIPELINE.md                       # 이 파일 (도식)
+├── pipeline.py                       # 진입점: python pipeline.py cases/<id>
+├── requirements.txt
+├── .env.example                      # ANTHROPIC_API_KEY 템플릿
+├── .gitignore
+├── lib/
+│   ├── claude_client.py              # Anthropic SDK 래퍼 (캐싱·thinking·pause_turn)
+│   └── prompt_loader.py              # .md 로더 + 변수 치환
+├── stages/
+│   ├── stage1_research.py            # 병렬 (asyncio.gather) doc 조사
+│   ├── stage2_verify.py              # 순차 verifier → critic
+│   └── stage3_write.py               # 병렬 internal/external 작성
 ├── config/
 │   ├── citation_policy.md            # 인용 규칙 (Stage 1·2 공통)
-│   ├── tone_guide_internal.md        # 사내 톤 (Stage 3-A) — TODO
-│   └── tone_guide_external.md        # 외부 톤 (Stage 3-B) — TODO
+│   ├── tone_guide_internal.md        # 사내 톤 (Stage 3-A)
+│   └── tone_guide_external.md        # 외부 톤 (Stage 3-B)
 ├── prompts/
-│   ├── stage1_research.md            # ✅ 본 PR에 포함
-│   ├── stage2_verify.md              # TODO
-│   ├── stage2_critic.md              # TODO
-│   ├── stage3_internal.md            # TODO
-│   └── stage3_external.md            # TODO
+│   └── stage1_research.md            # OMC 에이전트용 인간 가이드 (코드 버전은 stages/에 인라인)
 └── cases/
     └── _template/                    # 새 케이스 시작 시 복사할 템플릿
         ├── input.md
         └── output/
 ```
+
+## 실행 방법
+
+```bash
+# 1. 환경 준비
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env       # 그리고 ANTHROPIC_API_KEY 입력
+
+# 2. 새 케이스 시작
+cp -r cases/_template cases/2026-05-foo
+$EDITOR cases/2026-05-foo/input.md   # 질문 + 사실관계 채우기
+
+# 3. 파이프라인 실행
+python pipeline.py cases/2026-05-foo
+
+# 부분 실행 (이미 끝낸 단계 건너뛰기)
+python pipeline.py cases/2026-05-foo --skip stage1
+python pipeline.py cases/2026-05-foo --only stage3   # writers만 다시 돌리기
+```
+
+산출물:
+
+- `cases/<id>/research_notes_supreme_court.md` · `_lower_court.md` · `_doctrine.md` — Stage 1 raw
+- `cases/<id>/research_notes.md` — Stage 1 통합본
+- `cases/<id>/verified_claims.md` — Stage 2 검증 결과 + Critic 노트
+- `cases/<id>/output/internal_memo.md` — Stage 3 사내 메모
+- `cases/<id>/output/external_opinion.md` — Stage 3 외부 의견서
 
 ## 핵심 설계 원칙
 

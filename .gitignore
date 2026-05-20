@@ -1,0 +1,31 @@
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+*.egg-info/
+dist/
+build/
+
+# Case outputs — kept local, may contain confidential client info
+cases/*/research_notes_*.md
+cases/*/research_notes.md
+cases/*/verified_claims.md
+cases/*/output/*.md
+# Keep the template case scaffolding tracked
+!cases/_template/
+!cases/_template/**
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
