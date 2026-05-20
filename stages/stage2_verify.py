@@ -90,7 +90,9 @@ CRITIC_INSTRUCTION = """당신은 법률 리서치를 다각도로 검토하는 
 
 async def run(case_dir: Path) -> Path:
     """Execute Stage 2: verifier → critic, sequentially."""
-    research_notes = (case_dir / "research_notes.md").read_text(encoding="utf-8")
+    output_dir = case_dir / "output"
+    output_dir.mkdir(exist_ok=True)
+    research_notes = (output_dir / "research_notes.md").read_text(encoding="utf-8")
     citation_policy = prompt_loader.load("config/citation_policy.md")
 
     print("[stage2] Running verifier...")
@@ -106,9 +108,9 @@ async def run(case_dir: Path) -> Path:
         max_tokens=16000,
         effort="high",
     )
-    verified_path = case_dir / "verified_claims.md"
+    verified_path = output_dir / "verified_claims.md"
     verified_path.write_text(verifier_output, encoding="utf-8")
-    print(f"[stage2]   wrote {verified_path.name}")
+    print(f"[stage2]   wrote output/{verified_path.name}")
 
     print("[stage2] Running critic...")
     critic_system = "한국 법률 리서치를 다각도로 검토하세요. 누락된 반대 논거와 약한 추론을 찾으세요."
@@ -121,5 +123,5 @@ async def run(case_dir: Path) -> Path:
         effort="high",
     )
     verified_path.write_text(critic_output, encoding="utf-8")
-    print(f"[stage2]   updated {verified_path.name} (with critic notes)")
+    print(f"[stage2]   updated output/{verified_path.name} (with critic notes)")
     return verified_path

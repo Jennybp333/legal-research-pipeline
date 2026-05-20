@@ -95,7 +95,9 @@ async def _run_one_scope(scope_id: str, scope_desc: str, case_dir: Path, case_in
 
 
 def _merge(case_dir: Path, scope_files: list[Path]) -> Path:
-    merged_path = case_dir / "research_notes.md"
+    output_dir = case_dir / "output"
+    output_dir.mkdir(exist_ok=True)
+    merged_path = output_dir / "research_notes.md"
     parts: list[str] = ["# 리서치 노트 (Stage 1 통합)\n"]
     for path in scope_files:
         parts.append(f"\n<!-- source: {path.name} -->\n")

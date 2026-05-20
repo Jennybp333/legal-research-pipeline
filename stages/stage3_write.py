@@ -67,11 +67,10 @@ async def _run_one_writer(
 
 
 async def run(case_dir: Path) -> tuple[Path, Path]:
-    verified_claims = (case_dir / "verified_claims.md").read_text(encoding="utf-8")
-    case_input = (case_dir / "input.md").read_text(encoding="utf-8")
-
     output_dir = case_dir / "output"
     output_dir.mkdir(exist_ok=True)
+    verified_claims = (output_dir / "verified_claims.md").read_text(encoding="utf-8")
+    case_input = (case_dir / "input.md").read_text(encoding="utf-8")
 
     print("[stage3] Running internal + external writers in parallel...")
     internal_task = _run_one_writer(

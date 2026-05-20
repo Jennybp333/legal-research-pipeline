@@ -17,8 +17,6 @@ build/
 
 # Case outputs — kept local, may contain confidential client info
 cases/*/research_notes_*.md
-cases/*/research_notes.md
-cases/*/verified_claims.md
 cases/*/output/*.md
 # Keep the template case scaffolding tracked
 !cases/_template/
